@@ -1,0 +1,117 @@
+<html>
+<head>
+<title>SigPlusWeb Test Page</title>
+</head>
+<script type="text/javascript">
+	var Index;
+
+	function pluginLoaded()
+		{
+		//alert("Plugin loaded!");
+		}
+
+	function onClear()
+		{
+		document.getElementById('sigplus').clearSignature();
+		}
+
+	function onSign()
+		{
+		document.getElementById('sigplus').tabletState = 1;
+		document.getElementById('sigplus').captureMode = 1;
+		Index = setInterval(Refresh, 50);
+
+                document.getElementById('sigplus').antiAliasSpotSize = .85;
+                document.getElementById('sigplus').antiAliasLineScale = .55;
+		}
+
+
+	function onDone()
+		{
+                if(document.getElementById('sigplus').totalPoints==0)
+                   {
+                   alert("Please sign before continuing");
+                   return false;
+                   }
+                else
+                   {
+		   document.getElementById('sigplus').tabletState = 0;
+                   clearInterval(Index);
+
+                   //RETURN TOPAZ-FORMAT SIGSTRING
+                   document.getElementById('sigplus').compressionMode=1;
+                   document.SigForm.bioSigData.value=document.getElementById('sigplus').sigString;
+                   document.SigForm.sigStringData.value+=document.getElementById('sigplus').sigString;
+
+                   //this returns the signature in Topaz's own format, with biometric information
+
+
+                   //RETURN BMP BYTE ARRAY CONVERTED TO HEXADECIMAL STRING
+                   document.getElementById('sigplus').imageXSize = 500;
+                   document.getElementById('sigplus').imageYSize = 100;
+                   document.getElementById('sigplus').penWidth = 5;
+                   //SigPlus1.JustifyMode = 5;
+                   var bmpString = '';
+                   document.getElementById('sigplus').bitmapBufferWrite(5);
+                   var bmpSize = document.getElementById('sigplus').bitmapBufferSize();
+                   for(var a = 0; a < bmpSize; a++)
+                   {
+                     var byte = document.getElementById('sigplus').bitmapBufferByte(a).toString(16);
+                     if(byte.length === 1)
+                     {
+                        bmpString += '0';
+                     }
+                     bmpString += byte;
+                   }
+                   document.SigForm.sigImageData.value+=bmpString;
+                   //this example returns a bitmap image converted to a hexadecimal string
+                   //convert the string back to a byte array on the server for final imaging
+
+
+                   //document.SigForm.submit(); //SUBMIT THE FORM HERE
+                   }
+
+		}
+
+	function Refresh()
+		{
+		document.getElementById('sigplus').refreshEvent();
+		}
+
+
+</script>
+<body>
+<H1>SigPlusWeb NPAPI Javascript Demo</H1><BR>
+This demo shows how to use Topaz's SigPlusWeb NPAPI plugin to easily capture signatures using Internet Explorer, Firefox, and Chrome.<BR>Press 'Sign' to capture a signature, 'Clear' to clear it, and 'Done' to get back a signature in Topaz's biometric 'SigString' format, or as an image converted to a hexadecimal string for easy imaging of the signature back at the server.<BR>
+Please note that the demo places both SigString and hexadecimal image string into respective hidden fields to POST back to the server when the page is submitted.
+<br>
+<br>
+<table border="1" cellpadding="0"  width="500">
+  <tr>
+    <td height="10" width="500">
+<object id="sigplus"  type="application/sigplus" width="500" height="100">
+    <param name="onload" value="pluginLoaded" />
+</object>
+    </td>
+  </tr>
+</table>
+
+<FORM ACTION="DemoJavascript2.htm" METHOD=GET NAME="SigForm">
+<p>
+<input type="file" id="file1" style="display:none"/>
+<input id="SignBtn" name="SignBtn" type="button" value="Sign"  onclick="javascript:onSign()"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input id="button1" name="ClearBtn" type="button" value="Clear" onclick="javascript:onClear()"/>&nbsp;&nbsp;&nbsp;&nbsp
+
+<input id="button2" name="DoneBtn" type="button" value="Done" onclick="javascript:onDone()"/>&nbsp;&nbsp;&nbsp;&nbsp
+
+<INPUT TYPE=HIDDEN NAME="bioSigData">
+<INPUT TYPE=HIDDEN NAME="sigImgData">
+<BR>
+<BR>
+<TEXTAREA NAME="sigStringData" ROWS="20" COLS="50">SigString: </TEXTAREA>
+<TEXTAREA NAME="sigImageData" ROWS="20" COLS="50">Hexadecimal String: </TEXTAREA>
+</p>
+</FORM>
+</body>
+
+</html>
