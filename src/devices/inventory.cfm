@@ -96,7 +96,7 @@ else
 			</table>
 			<cfif isdefined("url.d") and url.d GT 0>
 				<cfquery name="getDeviceInfo">
-					select w.inDate,w.outDate
+					select w.dateTimeTracked
 						,b.description,b.location
 						,d.esn,d.deviceID
 						,s.status
@@ -112,14 +112,14 @@ else
 					order by inDate
 				</cfquery>
 				<table cellpadding="5" cellspacing="20">
-					<tr><th colspan="5"><h3>History: #getDeviceInfo.esn#</h3></th></tr>
-					<tr><th>Description</th><th>Location</th><th>In</th><th>Out</th><th>Status</th></tr>
+					<tr><th colspan="4"><h3>History: #getDeviceInfo.esn#</h3></th></tr>
+					<tr><th>Description</th><th>Location</th><th>Date/Time</th><!--- <th>In</th><th>Out</th> ---><th>Status</th></tr>
 					<cfloop query="getDeviceInfo">
 						<tr>
 							<td>#getDeviceInfo.description#</td>
 							<td>#getDeviceInfo.location#</td>
-							<td>#dateformat(getDeviceInfo.inDate,"MM/DD/YYYY")# #timeformat(getDeviceInfo.inDate,"HH:MM:SS")#</td>
-							<cfif getDeviceInfo.outDate GT "">
+							<td>#dateformat(getDeviceInfo.dateTimeTracked,"MM/DD/YYYY")# #timeformat(getDeviceInfo.dateTimeTracked,"HH:MM:SS")#</td>
+							<!--- <cfif getDeviceInfo.outDate GT "">
 								<td>#dateformat(getDeviceInfo.outDate,"MM/DD/YYYY")# #timeformat(getDeviceInfo.outDate,"HH:MM:SS")#</td>
 							<cfelse>
 								<td><select onchange="moveDevice(#getDeviceInfo.deviceID#)">
@@ -128,7 +128,7 @@ else
 											<option value="#qBins.binID#">#qBins.description#, #qBins.location#</option>
 										</cfloop>
 									</select></td>
-							</cfif>
+							</cfif> --->
 							<td>#getDeviceInfo.status#</td>
 						</tr>
 					</cfloop>
